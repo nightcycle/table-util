@@ -34,6 +34,71 @@ function Util.deepCopy(read: Table, log: {[Table]: Table}?): Table
 	end
 end
 
+function Util.randomize<V>(list: List<V>, seed: number?): List<V>
+	local rng = Random.new(seed or tick())
+	local scores = {}
+	for i, v in ipairs(list) do
+		scores[v] = rng:NextNumber()
+	end
+
+	local out = table.clone(list)
+	table.sort(out, function(a: V,b: V)
+		return scores[a] < scores[b]
+	end)
+
+	return out
+end
+
+function Util.setFromPath<V>(tree: Dict<string, any | V>, path: string, value: V, indexer: string?): nil
+	indexer = indexer or "/"
+	local keys = string.split(path, indexer)
+	if keys[1] == "" then
+		table.remove(keys, 1)
+	end
+	assert(#keys > 0, "Bad path")
+	local function write(source: Dict<string, any | V>, depth: number?): nil
+		depth = depth or 1
+		assert(depth ~= nil)
+		local key = keys[depth]
+		local val = source[key]
+		if depth == #keys then
+			source[key] = value 
+		else
+			if not val then
+				val = {}
+				source[key] = val
+			end
+			assert(val ~= nil)
+			write(val :: any, depth + 1)
+		end
+		return nil
+	end
+	return write(tree)
+end
+
+function Util.getFromPath<V>(tree: Dict<string, any | V>, path: string, indexer: string?): V?
+	indexer = indexer or "/"
+	local keys = string.split(path, indexer)
+	if keys[1] == "" then
+		table.remove(keys, 1)
+	end
+	assert(#keys > 0, "Bad path")
+	local function read(source: Dict<string, any | V>, depth: number?): V?
+		depth = depth or 1
+		assert(depth ~= nil)
+		local key = keys[depth]
+		if not key then return end
+		local val = source[key]
+		if depth == #keys then
+			return val
+		elseif val and type(val) == "table" then
+			return read(val, depth + 1)
+		end
+		return nil
+	end
+	return read(tree)
+end
+
 function Util.deduplicate<V>(list: List<V>): List<V>
 	local registry = {}
 	for i, v in ipairs(list) do
@@ -72,13 +137,21 @@ function Util.reverse<V>(list: List<V>): List<V>
 	return out
 end
 
-function Util.combine(a: Table, b: Table): Table
+function Util.merge<K,V>(a: Dict<K,V>, b: Dict<K,V>): Dict<K,V>
 	local out = {}
 	for k, v in pairs(a) do
 		out[k] = v
 	end
 	for k, v in pairs(b) do
 		out[k] = v
+	end
+	return out
+end
+
+function Util.append<V>(a: List<V>, b: List<V>): List<V>
+	local out = table.clone(a)
+	for i, v in ipairs(b) do
+		table.insert(out, v)
 	end
 	return out
 end
