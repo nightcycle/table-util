@@ -34,69 +34,26 @@ function Util.deepCopy(read: Table, log: {[Table]: Table}?): Table
 	end
 end
 
-function Util.randomize<V>(list: List<V>, seed: number?): List<V>
+function Util.map<K,IV,OV>(source: Dict<K,IV>, method: (K, IV) -> OV): Dict<K, OV>
+	local out = {}
+
+	for k, v in pairs(source) do
+		out[k] = method(k, v)
+	end
+
+	return out
+end
+
+function Util.randomize<V>(list: List<V>, seed: number?): ()
 	local rng = Random.new(seed or tick())
 	local scores = {}
 	for i, v in ipairs(list) do
 		scores[v] = rng:NextNumber()
 	end
 
-	local out = table.clone(list)
-	table.sort(out, function(a: V,b: V)
+	table.sort(list, function(a: V,b: V)
 		return scores[a] < scores[b]
 	end)
-
-	return out
-end
-
-function Util.setFromPath<V>(tree: Dict<string, any | V>, path: string, value: V, indexer: string?): nil
-	indexer = indexer or "/"
-	local keys = string.split(path, indexer)
-	if keys[1] == "" then
-		table.remove(keys, 1)
-	end
-	assert(#keys > 0, "Bad path")
-	local function write(source: Dict<string, any | V>, depth: number?): nil
-		depth = depth or 1
-		assert(depth ~= nil)
-		local key = keys[depth]
-		local val = source[key]
-		if depth == #keys then
-			source[key] = value 
-		else
-			if not val then
-				val = {}
-				source[key] = val
-			end
-			assert(val ~= nil)
-			write(val :: any, depth + 1)
-		end
-		return nil
-	end
-	return write(tree)
-end
-
-function Util.getFromPath<V>(tree: Dict<string, any | V>, path: string, indexer: string?): V?
-	indexer = indexer or "/"
-	local keys = string.split(path, indexer)
-	if keys[1] == "" then
-		table.remove(keys, 1)
-	end
-	assert(#keys > 0, "Bad path")
-	local function read(source: Dict<string, any | V>, depth: number?): V?
-		depth = depth or 1
-		assert(depth ~= nil)
-		local key = keys[depth]
-		if not key then return end
-		local val = source[key]
-		if depth == #keys then
-			return val
-		elseif val and type(val) == "table" then
-			return read(val, depth + 1)
-		end
-		return nil
-	end
-	return read(tree)
 end
 
 function Util.deduplicate<V>(list: List<V>): List<V>
@@ -127,14 +84,17 @@ function Util.values<V>(dict: Dict<any, V>): List<V>
 	return Util.deduplicate(list)
 end
 
-function Util.reverse<V>(list: List<V>): List<V>
-	local out = {}
+function Util.reverse<V>(list: List<V>): ()
+	local holder = {}
 
 	for i=#list, 1, -1 do
-		table.insert(out, list[i])
+		table.insert(holder, list[i])
 	end
 
-	return out
+	table.clear(list)
+	for i, v in ipairs(holder) do
+		list[i] = v
+	end
 end
 
 function Util.merge<K,V>(a: Dict<K,V>, b: Dict<K,V>): Dict<K,V>
@@ -148,12 +108,10 @@ function Util.merge<K,V>(a: Dict<K,V>, b: Dict<K,V>): Dict<K,V>
 	return out
 end
 
-function Util.append<V>(a: List<V>, b: List<V>): List<V>
-	local out = table.clone(a)
-	for i, v in ipairs(b) do
-		table.insert(out, v)
+function Util.append<V>(target: List<V>, add: List<V>): ()
+	for i, v in ipairs(add) do
+		table.insert(target, v)
 	end
-	return out
 end
 
 return Util

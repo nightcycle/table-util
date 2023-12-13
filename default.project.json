@@ -1,6 +1,6 @@
 {
-  "name": "table-util",
-  "tree": {
-    "$path": "src"
-  }
+	"name": "table-util",
+	"tree": {
+    		"$path": "src"
+	}
 }
