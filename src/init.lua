@@ -98,10 +98,7 @@ function Util.reverse<V>(list: List<V>): ()
 end
 
 function Util.merge<K,V>(a: Dict<K,V>, b: Dict<K,V>): Dict<K,V>
-	local out = {}
-	for k, v in pairs(a) do
-		out[k] = v
-	end
+	local out = table.clone(a)
 	for k, v in pairs(b) do
 		out[k] = v
 	end
