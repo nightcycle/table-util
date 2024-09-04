@@ -1,4 +1,5 @@
 --!strict
+--!native
 --Services
 --Packages
 --Modules
@@ -8,34 +9,32 @@
 --Class
 local Util = {}
 
-export type Table = {[any]: any}
-export type Dict<K, V> = {[K]: V}
-export type List<V> = {[number]: V}
+export type Table = { [any]: any }
+export type Dict<K, V> = { [K]: V }
+export type List<V> = { [number]: V }
 
-function Util.deepCopy(read: Table, log: {[Table]: Table}?): Table
+function Util.deepCopy(read: Table, log: { [Table]: Table }?): Table
 	log = log or {}
 	assert(log ~= nil)
 
 	if log[read] then
 		return log[read]
 	else
-		local out = {}
+		local out = table.clone(read)
 		log[read] = out
-	
-		for k, v in pairs(read) do
-			if type(v) == "table" then
+
+		for k, v in pairs(out) do
+			if typeof(v) == "table" then
 				out[k] = Util.deepCopy(v, log)
-			else
-				out[k] = v
 			end
 		end
-	
+
 		return out
 	end
 end
 
-function Util.map<K,IV,OV>(source: Dict<K,IV>, method: (K, IV) -> OV): Dict<K, OV>
-	local out = {}
+function Util.map<K, IV, OV>(source: Dict<K, IV>, method: (K, IV) -> OV): Dict<K, OV>
+	local out: Dict<K, OV> = {}
 
 	for k, v in pairs(source) do
 		out[k] = method(k, v)
@@ -51,21 +50,23 @@ function Util.randomize<V>(list: List<V>, seed: number?): ()
 		scores[v] = rng:NextNumber()
 	end
 
-	table.sort(list, function(a: V,b: V)
+	table.sort(list, function(a: V, b: V)
 		return scores[a] < scores[b]
 	end)
 end
 
-function Util.deduplicate<V>(list: List<V>): List<V>
-	local registry = {}
-	for i, v in ipairs(list) do
-		registry[v] = true
-	end
-	local out = {}
-	for v, _ in pairs(registry) do
-		table.insert(out, v)
-	end
-	return out
+function Util.deduplicate<V>(list: List<V>): ()
+	local registry: { [V]: true? } = {}
+	local i = 1
+	repeat
+		local v = list[i]
+		if not registry[v] then
+			registry[v] = true
+			i += 1
+		else
+			table.remove(list, i)
+		end
+	until i > #list
 end
 
 function Util.keys<K>(dict: Dict<K, any>): List<K>
@@ -73,7 +74,7 @@ function Util.keys<K>(dict: Dict<K, any>): List<K>
 	for k, v in pairs(dict) do
 		table.insert(list, k)
 	end
-	return Util.deduplicate(list)
+	return list
 end
 
 function Util.values<V>(dict: Dict<any, V>): List<V>
@@ -81,13 +82,12 @@ function Util.values<V>(dict: Dict<any, V>): List<V>
 	for k, v in pairs(dict) do
 		table.insert(list, v)
 	end
-	return Util.deduplicate(list)
+	return list
 end
 
 function Util.reverse<V>(list: List<V>): ()
 	local holder = {}
-
-	for i=#list, 1, -1 do
+	for i = #list, 1, -1 do
 		table.insert(holder, list[i])
 	end
 
@@ -97,7 +97,7 @@ function Util.reverse<V>(list: List<V>): ()
 	end
 end
 
-function Util.merge<K,V>(a: Dict<K,V>, b: Dict<K,V>): Dict<K,V>
+function Util.merge<K, V>(a: Dict<K, V>, b: Dict<K, V>): Dict<K, V>
 	local out = table.clone(a)
 	for k, v in pairs(b) do
 		out[k] = v

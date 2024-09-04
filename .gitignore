@@ -1,14 +1,14 @@
 
 
 # Directories
-out/**
-Packages/**
-scripts/compile/__pycache__/**
+Packages
+node_modules
+build
+serve
 
 # Files
 sourcemap.json
 wally.lock
-package-lock.json
 
 # File types
 *.lock

@@ -1,15 +1,11 @@
 {
-  "name": "table-util-test",
-  "tree": {
-    "$className": "DataModel",
-    "ReplicatedStorage": {
-      "$className": "ReplicatedStorage",
-      "Packages": {
-		"$className": "Folder",
-        "synthetic": {
-          "$path": "src"
-        }
-      }
-    }
-  }
-}
+	"name": "table-util-dev",
+	"tree": {
+	    "$className": "DataModel",
+	    "ReplicatedStorage": {
+		   "table-util": {
+			  "$path": "src"
+		   }
+	    }
+	}
+ }

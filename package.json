@@ -1,0 +1,25 @@
+{
+  "name": "@nightcycle/table-util",
+  "version": "1.0.0",
+  "description": "A wrapper for stateful services",
+  "license": "Apache-2.0",
+  "author": "nightcycle <coyer@nightcycle.us>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nightcycle/table-util.git"
+  },
+  "main": "src/init.luau",
+  "scripts": {
+    "prepare": "npmluau"
+  },
+  "devDependencies": {
+    "npmluau": "^0.1.1"
+  },
+  "keywords": [
+    "luau"
+  ],
+  "bugs": {
+    "url": "https://github.com/nightcycle/table-util/issues"
+  },
+  "homepage": "https://github.com/nightcycle/table-util#readme"
+}

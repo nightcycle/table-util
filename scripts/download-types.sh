@@ -4,8 +4,6 @@
 if [ ! -d "types" ]; then
   mkdir "types"
 fi
-curl -L "https://gist.github.com/nightcycle/50ca8f42147077b8f584b503030c8500/raw" > "types/testEZ.d.lua"
-curl -L "https://gist.github.com/nightcycle/ae7ea3376337512772d1d2b314ef467b/raw" > "types/remodel.d.lua"
 curl -L "https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.d.lua" > "types/globalTypes.d.lua"
 
 # lint definitions
