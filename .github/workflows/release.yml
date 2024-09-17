@@ -82,6 +82,7 @@ jobs:
         shell: bash
         run: |
           wally login --token "${{secrets.WALLY_TOKEN}}"
+          cp "$ROJO_CONFIG" "default.project.json"
           wally publish
 
   publish_to_npm:
