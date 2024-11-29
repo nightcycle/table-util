@@ -56,6 +56,9 @@ function Util.randomize<V>(list: List<V>, seed: number?): ()
 end
 
 function Util.deduplicate<V>(list: List<V>): ()
+	if #list <= 1 then
+		return
+	end
 	local registry: { [V]: true? } = {}
 	local i = 1
 	repeat
