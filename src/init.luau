@@ -13,7 +13,7 @@ export type Table = { [any]: any }
 export type Dict<K, V> = { [K]: V }
 export type List<V> = { [number]: V }
 
-function Util.deepCopy(read: Table, log: { [Table]: Table }?): Table
+function Util.deepCopy<O>(read: Table & O, log: { [Table & O]: Table & O }?): O
 	log = log or {}
 	assert(log ~= nil)
 
@@ -21,15 +21,26 @@ function Util.deepCopy(read: Table, log: { [Table]: Table }?): Table
 		return log[read]
 	else
 		local out = table.clone(read)
-		log[read] = out
+		log[read] = out :: any
 
 		for k, v in pairs(out) do
 			if typeof(v) == "table" then
-				out[k] = Util.deepCopy(v, log)
+				out[k] = Util.deepCopy(v, log) :: any
 			end
 		end
 
-		return out
+		return out :: any
+	end
+end
+
+function Util.deepFreeze(source: Table): ()
+	if not table.isfrozen(source) then
+		table.freeze(source)
+	end
+	for k, v in pairs(source) do
+		if typeof(v) == "table" then
+			Util.deepFreeze(v)
+		end
 	end
 end
 

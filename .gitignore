@@ -5,6 +5,8 @@ Packages
 node_modules
 build
 serve
+types
+lints
 
 # Files
 sourcemap.json
